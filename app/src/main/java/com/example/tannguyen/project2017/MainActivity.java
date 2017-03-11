@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                     // listCustomer.add(dataSnapshot.child("Ho Chi Minh").child("Binh Thanh").child("Customer"+i).getValue(Customer.class));
                     for(com.google.firebase.database.DataSnapshot datachild : dataSnapshot.child(dataS.getKey()).getChildren()) {
                         String b=datachild.getKey();
-                        for(int i=1;i<=dataSnapshot.child(dataS.getKey()).child(datachild.getKey()).getChildrenCount();i++) {
+                        for(int i=0;i< (dataSnapshot.child(dataS.getKey()).child(datachild.getKey())).getChildrenCount();i++) {
                             customerArrayList.add(dataSnapshot.child(dataS.getKey()).child(datachild.getKey()).child("Customer"+i).getValue(Customer.class));
                             arrayAdapterCustomer.notifyDataSetChanged();
                             //SystemClock.sleep(1000);
