@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "667373561236",
+    "firebase_url": "https://doan-63316.firebaseio.com",
+    "project_id": "doan-63316",
+    "storage_bucket": "doan-63316.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667373561236:android:9dd1570c273b6070",
+        "android_client_info": {
+          "package_name": "com.example.tannguyen.project2017"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "667373561236-fvttsa8l6ag37q2muuf3qihkusp0bpvb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfTkWB102fvp3xxIiIdY92Hsl-6QKREHE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
