@@ -3,14 +3,20 @@ package com.example.tannguyen.project2017;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.firebase.client.Firebase;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import Destination.Des;
 import class_Customer.Customer;
@@ -19,6 +25,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private TextView tvName,tvAddressStart,tvAddressDestination,tvNumPhone,tvWeight,tvDuration,tvDistance;
+    private Button btnselect;
+    private Customer data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +37,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         anhxa();
-
+        event();
     }
 
 
@@ -56,11 +64,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         tvWeight=(TextView)findViewById(R.id.tvWeight);
         tvDistance=(TextView)findViewById(R.id.tvDistance);
         tvDuration=(TextView)findViewById(R.id.tvDuration);
+        btnselect=(Button)findViewById(R.id.btnselect);
+        btnselect.setVisibility(View.VISIBLE);
     }
     public void load_intent() {
         Intent intent=getIntent();
         Bundle bundle=intent.getBundleExtra("bundle");
-        Customer data= (Customer) bundle.getSerializable("select_custormer");
+        data= (Customer) bundle.getSerializable("select_custormer");
         tvName.setText(data.getName());
         tvWeight.setText(String.valueOf(data.getWeight()));
         tvNumPhone.setText(String.valueOf(data.getPhoneNumber()));
@@ -68,5 +78,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         tvAddressDestination.setText(data.getAddress()+", "+data.getDistrict()+", "+data.getCity());
         Des des=new Des(mMap,MapsActivity.this,tvDistance,tvDuration);
         des.execute(data);
+    }
+    public void event(){
+        btnselect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference myRef= database.getReference("doan-63316").getParent().child("Customers").child(data.getCity()).child(data.getDistrict()).child(String.valueOf(data.getId()));
+                myRef.removeValue();
+                DatabaseReference myRef2=database.getReference("doan-63316").getParent().child(SignInActivity.user).child(data.getCity()).child(data.getDistrict()).child(String.valueOf(data.getId()));
+                myRef2.setValue(data);
+            }
+        });
     }
 }
