@@ -1,5 +1,6 @@
 package com.example.tannguyen.project2017;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -43,24 +44,30 @@ public class SignInActivity extends AppCompatActivity {
         btnSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final ProgressDialog progressdialog = new ProgressDialog(SignInActivity.this);
+                progressdialog.setMessage("Check Account...");
+                progressdialog.show();
                 String email = edtEmail.getText().toString();
                 String password = edtPassword.getText().toString();
 
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(SignInActivity.this,
                             "Please enter the email", Toast.LENGTH_LONG).show();
+                    progressdialog.cancel();
                     return;
                 }
 
                 if (TextUtils.isEmpty(password)) {
                     Toast.makeText(SignInActivity.this,
                             "Please enter the password", Toast.LENGTH_LONG).show();
+                    progressdialog.cancel();
                     return;
                 }
 
                 if (password.length() < 6) {
                     Toast.makeText(SignInActivity.this,
                             "Password musts be larger than 6 character", Toast.LENGTH_LONG).show();
+                    progressdialog.cancel();
                     return;
                 }
                 progress.setVisibility(View.VISIBLE);
@@ -72,6 +79,7 @@ public class SignInActivity extends AppCompatActivity {
                                 if (!task.isSuccessful()) {
                                     Toast.makeText(SignInActivity.this,
                                             "Log in is unsuccessful" + task.isSuccessful(), Toast.LENGTH_LONG).show();
+                                    progressdialog.cancel();
 
                                 } else {
                                     Toast.makeText(SignInActivity.this,
@@ -79,6 +87,7 @@ public class SignInActivity extends AppCompatActivity {
                                     user=edtEmail.getText().toString().split("@")[0];
                                     Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                                     startActivity(intent);
+                                    progressdialog.cancel();
                                 }
                             }
                         }

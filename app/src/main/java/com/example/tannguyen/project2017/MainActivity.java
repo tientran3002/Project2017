@@ -1,5 +1,6 @@
 package com.example.tannguyen.project2017;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -54,12 +55,14 @@ public class MainActivity extends AppCompatActivity {
     private ListView lvData, lvHistory;
     private AutoCompleteTextView autoeditDistrict, autoeditCity;
     private Boolean check_history = false;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         anhXa();
+        progressDialog.show();
         loadListView();
         loadData("", "", "", false);
         event();
@@ -77,12 +80,15 @@ public class MainActivity extends AppCompatActivity {
         array_district = new String[]{"Quan 1", "Quan 2", "Quan 3", "Quan 4", "Quan 5", "Quan 6", "Quan 7", "Quan 8", "Quan 9", "Quan 10", "Quan 11", "Quan 12", "Thu Duc", "Binh Thanh", "Go Vap"};
         array_city = new String[]{"Ho Chi Minh", "Ha Noi"};
         lvHistory = (ListView) findViewById(R.id.lvHistory);
+        progressDialog=new ProgressDialog(MainActivity.this);
+        progressDialog.setMessage("Handling..");
     }
     //bat cac su kien
     public void event() {
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressDialog.show();
                 lvHistory.setVisibility(View.GONE);
                 lvData.setVisibility(View.VISIBLE);
                 String search_district = autoeditDistrict.getText().toString();
@@ -95,12 +101,14 @@ public class MainActivity extends AppCompatActivity {
         lvData.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                progressDialog.show();
                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("select_custormer", customerArrayList.get(position));
                 intent.putExtra("bundle", bundle);
                 startActivity(intent);
                 check_history = false;
+                progressDialog.cancel();
             }
         });
         //chon du lieu trong my order
@@ -134,11 +142,13 @@ public class MainActivity extends AppCompatActivity {
                 alertDialogBuilder.setCancelable(false).setPositiveButton("Show",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                progressDialog.show();
                                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
                                 Bundle bundle = new Bundle();
                                 bundle.putSerializable("select_custormer", customerArrayList.get(position));
                                 intent.putExtra("bundle", bundle);
                                 startActivity(intent);
+                                progressDialog.cancel();
                             }
                         })
                         .setNeutralButton("Cancel",
@@ -203,10 +213,12 @@ public class MainActivity extends AppCompatActivity {
                                 //String s=datachild2.getKey();
                                 customerArrayList.add(customer);
                                 arrayAdapterCustomer.notifyDataSetChanged();
+
                                 //Log.d("sd","1");
                             }
                         }
                     }
+                    progressDialog.cancel();
                 } else if (history) {
                     for (DataSnapshot dataS : dataSnapshot.child(SignInActivity.user + "-history").getChildren()) {
                         // listCustomer.add(dataSnapshot.child("Ho Chi Minh").child("Binh Thanh").child("Customer"+i).getValue(Customer.class));
@@ -216,10 +228,12 @@ public class MainActivity extends AppCompatActivity {
                                 //String s=datachild2.getKey();
                                 customerArrayList.add(customer);
                                 arrayAdapterCustomer.notifyDataSetChanged();
+
                                 //Log.d("sd","1");
                             }
                         }
                     }
+                    progressDialog.cancel();
                 } else if (district.equals("") || city.equals("")) {
                     for (DataSnapshot dataS : dataSnapshot.child("Customers").getChildren()) {
                         // listCustomer.add(dataSnapshot.child("Ho Chi Minh").child("Binh Thanh").child("Customer"+i).getValue(Customer.class));
@@ -241,16 +255,21 @@ public class MainActivity extends AppCompatActivity {
                                 arrayAdapterCustomer.notifyDataSetChanged();
                                 //Log.d("sd","1");
                             }
+
                         }
                     }
+                    progressDialog.cancel();
                 } else {
                     for (DataSnapshot data : dataSnapshot.child("Customers").child(city).child(district).getChildren()) {
 
                         Customer customer = data.getValue(Customer.class);
                         customerArrayList.add(customer);
                         arrayAdapterCustomer.notifyDataSetChanged();
+
                     }
+                    progressDialog.cancel();
                 }
+
             }
 
             @Override
