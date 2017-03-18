@@ -5,10 +5,13 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.firebase.client.Firebase;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -17,6 +20,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import Destination.Des;
 import class_Customer.Customer;
@@ -27,6 +32,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView tvName,tvAddressStart,tvAddressDestination,tvNumPhone,tvWeight,tvDuration,tvDistance;
     private Button btnselect;
     private Customer data;
+    private ImageView img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +72,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         tvDuration=(TextView)findViewById(R.id.tvDuration);
         btnselect=(Button)findViewById(R.id.btnselect);
         btnselect.setVisibility(View.VISIBLE);
+        img=(ImageView)findViewById(R.id.imageView);
     }
     public void load_intent() {
         Intent intent=getIntent();
@@ -76,6 +83,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         tvNumPhone.setText(String.valueOf(data.getPhoneNumber()));
         tvAddressStart.setText(data.getAddressStart());
         tvAddressDestination.setText(data.getAddress()+", "+data.getDistrict()+", "+data.getCity());
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        final StorageReference store_image=storage.getReferenceFromUrl("gs://doan-63316.appspot.com/hh.jpg");
+        Glide.with(MapsActivity.this)
+                .using(new FirebaseImageLoader())
+                .load(store_image)
+                .into(img);
         Des des=new Des(mMap,MapsActivity.this,tvDistance,tvDuration);
         des.execute(data);
     }

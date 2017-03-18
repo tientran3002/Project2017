@@ -8,6 +8,7 @@
     android:paddingRight="10dp"
     android:paddingTop="10dp"
     android:orientation="vertical"
+    android:background="@drawable/bk"
     tools:context="com.example.tannguyen.project2017.SignInActivity">
     <ProgressBar
         style="?android:attr/progressBarStyleHorizontal"
@@ -16,11 +17,11 @@
         android:id="@+id/progressBar" />
 
     <TextView
+        android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Email"
-        android:id="@+id/textView2" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
         android:layout_width="match_parent"
@@ -28,11 +29,11 @@
         android:id="@+id/edtEmail"/>
 
     <TextView
+        android:id="@+id/textView3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Password"
-        android:id="@+id/textView3" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
         android:layout_width="match_parent"
@@ -41,11 +42,12 @@
         android:inputType="textPassword"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/btnSignin"
-        android:text="Sign In"
-        android:layout_gravity="center"/>
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:background="@drawable/custom_button"
+        android:text="Sign In" />
 
     <TextView
         android:layout_width="wrap_content"

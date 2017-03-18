@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bk"
     android:orientation="vertical">
 
     <TableRow
@@ -13,37 +14,44 @@
         <TextView
             android:id="@+id/textView8"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="District" />
+            android:layout_height="30dp"
+            android:background="@drawable/custom_textview"
+            android:gravity="center_vertical"
+            android:text="District"
+            android:theme="@style/Base.AlertDialog.AppCompat.Light" />
 
         <AutoCompleteTextView
             android:id="@+id/autoeditDistrict"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:textSize="13sp"
+            android:layout_marginLeft="2dp"
             android:completionThreshold="1"
-            android:dropDownWidth="match_parent"/>
+            android:dropDownWidth="match_parent"
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/textView9"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="City" />
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:background="@drawable/custom_textview"
+            android:gravity="center_vertical"
+            android:text="City"
+            android:textAlignment="center" />
 
         <AutoCompleteTextView
             android:id="@+id/autoeditCity"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:textSize="13sp"
+            android:layout_marginLeft="2dp"
             android:completionThreshold="1"
-            android:dropDownWidth="match_parent"/>
+            android:dropDownWidth="match_parent"
+            android:textSize="13sp" />
 
         <Button
             android:id="@+id/btnSearch"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
+            android:background="@drawable/custom_button"
             android:text="Search"
             android:textSize="10sp" />
     </TableRow>
@@ -51,7 +59,14 @@
     <ListView
         android:id="@+id/lvData"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="visible" />
+
+    <ListView
+        android:id="@+id/lvHistory"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 
 </LinearLayout>

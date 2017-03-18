@@ -7,6 +7,7 @@
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
     android:paddingTop="10dp"
+    android:background="@drawable/bk"
     android:orientation="vertical"
     tools:context="com.example.tannguyen.project2017.ResetActivity">
 
@@ -24,9 +25,10 @@
         android:inputType="textEmailAddress"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/btnSend"
-        android:text="Send"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/custom_button"
+        android:text="Send" />
 </LinearLayout>

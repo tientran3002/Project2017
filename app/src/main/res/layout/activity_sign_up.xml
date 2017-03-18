@@ -8,6 +8,7 @@
     android:paddingRight="10dp"
     android:paddingTop="10dp"
     android:orientation="vertical"
+    android:background="@drawable/bk"
     tools:context="com.example.tannguyen.project2017.SignUpActivity">
 
     <TextView
