@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "667373561236",
-    "firebase_url": "https://doan-63316.firebaseio.com",
-    "project_id": "doan-63316",
-    "storage_bucket": "doan-63316.appspot.com"
+    "project_number": "129313394159",
+    "firebase_url": "https://doan-72e1b.firebaseio.com",
+    "project_id": "doan-72e1b",
+    "storage_bucket": "doan-72e1b.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:667373561236:android:9dd1570c273b6070",
+        "mobilesdk_app_id": "1:129313394159:android:9dd1570c273b6070",
         "android_client_info": {
           "package_name": "com.example.tannguyen.project2017"
         }
       },
       "oauth_client": [
         {
-          "client_id": "667373561236-fvttsa8l6ag37q2muuf3qihkusp0bpvb.apps.googleusercontent.com",
+          "client_id": "129313394159-n8brsts65mah097dnnfj12nprgse5lta.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDfTkWB102fvp3xxIiIdY92Hsl-6QKREHE"
+          "current_key": "AIzaSyBf5IBiXUxpMhYm5IpzQei8YCY7-2AMtJ8"
         }
       ],
       "services": {

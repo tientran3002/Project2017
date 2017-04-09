@@ -1,5 +1,6 @@
 package com.example.tannguyen.project2017;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,11 +45,12 @@ import java.util.ArrayList;
 
 import class_Customer.Customer;
 import custom_listview.MyArrayAdapter;
+import location.get_Location;
+import read_data.get_data;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btnSearch, btndelete;
-    private LinearLayout layoutMap;
+    private Button btnSearch;
     private ArrayList<Customer> customerArrayList;
     private String[] array_district, array_city;
     private MyArrayAdapter arrayAdapterCustomer;
@@ -56,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
     private AutoCompleteTextView autoeditDistrict, autoeditCity;
     private Boolean check_history = false;
     private ProgressDialog progressDialog;
+    private get_data getdata;
+    private String url="https://doan-72e1b.firebaseio.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,15 +68,20 @@ public class MainActivity extends AppCompatActivity {
         anhXa();
         progressDialog.show();
         loadListView();
-        loadData("", "", "", false);
+        getdata=new get_data(MainActivity.this,customerArrayList,arrayAdapterCustomer,progressDialog,"https://doan-72e1b.firebaseio.com/Customers");
+        getdata.loadData();
         event();
+        //start service
+        if(!service_notify.running) {
+            Intent myIntent = new Intent(MainActivity.this, service_notify.class);
+            // Gọi phương thức startService (Truyền vào đối tượng Intent)
+            this.startService(myIntent);}
         //test_datafirebase();
         //test_load_data();
     }
 
     public void anhXa() {
         btnSearch = (Button) findViewById(R.id.btnSearch);
-        layoutMap = (LinearLayout) findViewById(R.id.layoutMap);
         lvData = (ListView) findViewById(R.id.lvData);
         customerArrayList = new ArrayList<Customer>();
         autoeditCity = (AutoCompleteTextView) findViewById(R.id.autoeditCity);
@@ -82,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
         lvHistory = (ListView) findViewById(R.id.lvHistory);
         progressDialog=new ProgressDialog(MainActivity.this);
         progressDialog.setMessage("Handling..");
+        autoeditDistrict.setAdapter(new ArrayAdapter<String>(MainActivity.this, R.layout.custom_auto,R.id.autoCompleteItem, array_district));
+        autoeditCity.setAdapter(new ArrayAdapter<String>(MainActivity.this, R.layout.custom_auto,R.id.autoCompleteItem, array_city));
     }
     //bat cac su kien
     public void event() {
@@ -93,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 lvData.setVisibility(View.VISIBLE);
                 String search_district = autoeditDistrict.getText().toString();
                 String search_city = autoeditCity.getText().toString();
-                loadData(search_district, search_city, "", false);
+                //loadData();
                 check_history = false;
             }
         });
@@ -106,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("select_custormer", customerArrayList.get(position));
                 intent.putExtra("bundle", bundle);
+                intent.putExtra("button",true);
                 startActivity(intent);
                 check_history = false;
                 progressDialog.cancel();
@@ -133,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                 tvAddressStart.setText(customerArrayList.get(position).getAddressStart());
                 tvAddressDestination.setText(customerArrayList.get(position).getAddress()+", "+customerArrayList.get(position).getDistrict()+", "+customerArrayList.get(position).getCity());
                 FirebaseStorage storage = FirebaseStorage.getInstance();
-                final StorageReference store_image=storage.getReferenceFromUrl("gs://doan-63316.appspot.com/hh.jpg");
+                final StorageReference store_image=storage.getReferenceFromUrl("gs://doan-72e1b.appspot.com/hh.jpg");
                 Glide.with(MainActivity.this)
                         .using(new FirebaseImageLoader())
                         .load(store_image)
@@ -160,11 +172,17 @@ public class MainActivity extends AppCompatActivity {
                         .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                DatabaseReference myRef = database.getReference("doan-63316").getParent().child(SignInActivity.user + "-history").child(customerArrayList.get(position).getCity()).child(customerArrayList.get(position).getDistrict()).child(String.valueOf(customerArrayList.get(position).getId()));
-                                myRef.removeValue();
-                                if (!check_history) {
-                                    DatabaseReference myRef2 = database.getReference("doan-63316").getParent().child(SignInActivity.user + "-history").child(customerArrayList.get(position).getCity()).child(customerArrayList.get(position).getDistrict()).child(String.valueOf(customerArrayList.get(position).getId()));
+                                if (check_history) {
+                                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                    DatabaseReference myRef = database.getReference("doan-72e1b").getParent().child(SignInActivity.user+"-history").child(String.valueOf(customerArrayList.get(position).getId()));
+                                    myRef.removeValue();
+                                    check_history=false;
+                                }
+                                else {
+                                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                    DatabaseReference myRef = database.getReference("doan-72e1b").getParent().child(SignInActivity.user).child(String.valueOf(customerArrayList.get(position).getId()));
+                                    myRef.removeValue();
+                                    DatabaseReference myRef2 = database.getReference("doan-72e1b").getParent().child(SignInActivity.user + "-history").child(String.valueOf(customerArrayList.get(position).getId()));
                                     myRef2.setValue(customerArrayList.get(position));
                                     check_history=false;
                                 }
@@ -184,199 +202,23 @@ public class MainActivity extends AppCompatActivity {
         arrayAdapterCustomer = new MyArrayAdapter(MainActivity.this, customerArrayList, R.layout.custom_listview);
         lvData.setAdapter(arrayAdapterCustomer);
     }
-    //load du lieu tu firebase
-    public void loadData(final String district, final String city, final String order, final Boolean history) {
-
-        autoeditDistrict.setAdapter(new ArrayAdapter<String>(MainActivity.this, R.layout.custom_auto,R.id.autoCompleteItem, array_district));
-        autoeditCity.setAdapter(new ArrayAdapter<String>(MainActivity.this, R.layout.custom_auto,R.id.autoCompleteItem, array_city));
-
-        Firebase.setAndroidContext(MainActivity.this);
-        Firebase myFireBase = new Firebase("https://doan-63316.firebaseio.com/");
-        //load hinh
-//        FirebaseStorage storage = FirebaseStorage.getInstance();
-//        final StorageReference store_image=storage.getReferenceFromUrl("gs://doan-63316.appspot.com/");
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("doan-63316").getParent().child("Customers").child("Ho Chi Minh").child("Binh Thanh").child("Customer1");
-        myRef.setValue(null);
-        myFireBase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                //a[0] =  dataSnapshot.getValue();
-                customerArrayList.clear();
-                if (!order.equals("")) {
-                    for (DataSnapshot dataS : dataSnapshot.child(order).getChildren()) {
-                        // listCustomer.add(dataSnapshot.child("Ho Chi Minh").child("Binh Thanh").child("Customer"+i).getValue(Customer.class));
-                        for (DataSnapshot datachild : dataSnapshot.child(order).child(dataS.getKey()).getChildren()) {
-                            for (DataSnapshot datachild2 : dataSnapshot.child(order).child(dataS.getKey()).child(datachild.getKey()).getChildren()) {
-                                Customer customer = datachild2.getValue(Customer.class);
-                                //String s=datachild2.getKey();
-                                customerArrayList.add(customer);
-                                arrayAdapterCustomer.notifyDataSetChanged();
-
-                                //Log.d("sd","1");
-                            }
-                        }
-                    }
-                    progressDialog.cancel();
-                } else if (history) {
-                    for (DataSnapshot dataS : dataSnapshot.child(SignInActivity.user + "-history").getChildren()) {
-                        // listCustomer.add(dataSnapshot.child("Ho Chi Minh").child("Binh Thanh").child("Customer"+i).getValue(Customer.class));
-                        for (DataSnapshot datachild : dataSnapshot.child(SignInActivity.user + "-history").child(dataS.getKey()).getChildren()) {
-                            for (DataSnapshot datachild2 : dataSnapshot.child(SignInActivity.user + "-history").child(dataS.getKey()).child(datachild.getKey()).getChildren()) {
-                                Customer customer = datachild2.getValue(Customer.class);
-                                //String s=datachild2.getKey();
-                                customerArrayList.add(customer);
-                                arrayAdapterCustomer.notifyDataSetChanged();
-
-                                //Log.d("sd","1");
-                            }
-                        }
-                    }
-                    progressDialog.cancel();
-                } else if (district.equals("") || city.equals("")) {
-                    for (DataSnapshot dataS : dataSnapshot.child("Customers").getChildren()) {
-                        // listCustomer.add(dataSnapshot.child("Ho Chi Minh").child("Binh Thanh").child("Customer"+i).getValue(Customer.class));
-                        for (DataSnapshot datachild : dataSnapshot.child("Customers").child(dataS.getKey()).getChildren()) {
-                            //String b = datachild.getKey();
-//                            for (int i = 1; i <= dataSnapshot.child("Customers").child(dataS.getKey()).child(datachild.getKey()).getChildrenCount(); i++) {
-//                                Customer customer=(dataSnapshot.child("Customers").child(dataS.getKey()).child(datachild.getKey()).child("Customer" + i).getValue(Customer.class));
-//                                customerArrayList.add(customer);
-//                                arrayAdapterCustomer.notifyDataSetChanged();
-//
-//
-//                                //SystemClock.sleep(1000);
-//                                //publishProgress(i);
-//                            }
-                            for (DataSnapshot datachild2 : dataSnapshot.child("Customers").child(dataS.getKey()).child(datachild.getKey()).getChildren()) {
-                                Customer customer = datachild2.getValue(Customer.class);
-                                //String s=datachild2.getKey();
-                                customerArrayList.add(customer);
-                                arrayAdapterCustomer.notifyDataSetChanged();
-                                //Log.d("sd","1");
-                            }
-
-                        }
-                    }
-                    progressDialog.cancel();
-                } else {
-                    for (DataSnapshot data : dataSnapshot.child("Customers").child(city).child(district).getChildren()) {
-
-                        Customer customer = data.getValue(Customer.class);
-                        customerArrayList.add(customer);
-                        arrayAdapterCustomer.notifyDataSetChanged();
-
-                    }
-                    progressDialog.cancel();
-                }
-
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
-//        myFireBase.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                Log.d("add", "add");
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//                Log.d("sd", "sad");
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(FirebaseError firebaseError) {
-//
-//            }
-//        });
-    }
 
     public void test_datafirebase() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef;
 
         for (int i = 1; i <= 10; i++) {
-            myRef = database.getReference("doan-63316").getParent().child("Customers").child("Ho Chi Minh").child("Binh Thanh").child(String.valueOf(i));
+            myRef = database.getReference("doan-72e1b").getParent().child("Customers").child(String.valueOf(i));
             Customer customer = new Customer("Tan" + i, "Vo Van Ngan Thu Duc", "Bach Dang", "Binh Thanh", "Ho Chi Minh", (double) (12 + i), 900 + i, null, i);
             myRef.setValue(customer);
         }
-        //myRef = database.getReference("doan-63316").getParent().child("Customer").child("Ho Chi Minh").child("Quan 9");
-        for (int i = 1; i <= 10; i++) {
-            myRef = database.getReference("doan-63316").getParent().child("Customers").child("Ho Chi Minh").child("Quan 9").child(String.valueOf(i));
+        //myRef = database.getReference("doan-72e1b").getParent().child("Customer").child("Ho Chi Minh").child("Quan 9");
+        for (int i = 11; i <= 20; i++) {
+            myRef = database.getReference("doan-72e1b").getParent().child("Customers").child(String.valueOf(i));
             Customer customer = new Customer("Tan" + i, "Bach Dang Binh Thanh", "Le Van Viet", "Quan 9", "Ho Chi Minh", (double) (12 + i), 900 + i, null, i);
             myRef.setValue(customer);
         }
     }
-//    public void test_load_data() {
-//        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-//        DatabaseReference myRef=database.getReference("doan-63316").getParent();
-//        myRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
-//            @Override
-//            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-//                customerArrayList.clear();
-//                for(com.google.firebase.database.DataSnapshot dataS : dataSnapshot.child("Customers").getChildren()) {
-//                    // listCustomer.add(dataSnapshot.child("Ho Chi Minh").child("Binh Thanh").child("Customer"+i).getValue(Customer.class));
-//                    for(com.google.firebase.database.DataSnapshot datachild : dataSnapshot.child("Customers").child(dataS.getKey()).getChildren()) {
-//                        String b=datachild.getKey();
-//                        for(int i=0;i< (dataSnapshot.child(dataS.getKey()).child(datachild.getKey())).getChildrenCount();i++) {
-//                            customerArrayList.add(dataSnapshot.child("Customers").child(dataS.getKey()).child(datachild.getKey()).child("Customer"+i).getValue(Customer.class));
-//                            arrayAdapterCustomer.notifyDataSetChanged();
-//                            //SystemClock.sleep(1000);
-//                            //publishProgress(i);
-//                        }
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//        myRef.addChildEventListener(new com.google.firebase.database.ChildEventListener() {
-//            @Override
-//            public void onChildAdded(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildChanged(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
-//
-//                Log.d("sd","sda");
-//            }
-//
-//            @Override
-//            public void onChildRemoved(com.google.firebase.database.DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//        Log.d("ads","sad");
-//    }
     //tao menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -392,15 +234,20 @@ public class MainActivity extends AppCompatActivity {
             lvHistory.setVisibility(View.VISIBLE);
             lvData.setVisibility(View.GONE);
             lvHistory.setAdapter(arrayAdapterCustomer);
-            loadData("", "", SignInActivity.user, false);
-            Log.d("check",check_history.toString());
+            //loadData();
+            String url2=url+"/"+SignInActivity.user;
+            getdata=new get_data(MainActivity.this,customerArrayList,arrayAdapterCustomer,progressDialog,url2);
+            getdata.loadData();
         }
         if (id == R.id.item_history) {
             check_history = true;
             lvHistory.setVisibility(View.VISIBLE);
             lvData.setVisibility(View.GONE);
             lvHistory.setAdapter(arrayAdapterCustomer);
-            loadData("", "", "", true);
+            String url2=url+"/"+SignInActivity.user+"-history";
+            getdata=new get_data(MainActivity.this,customerArrayList,arrayAdapterCustomer,progressDialog,url2);
+            getdata.loadData();
+            //loadData();
         }
         return super.onOptionsItemSelected(item);
     }
