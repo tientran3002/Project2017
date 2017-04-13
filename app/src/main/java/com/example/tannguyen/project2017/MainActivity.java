@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -42,6 +43,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import class_Customer.Customer;
 import custom_listview.MyArrayAdapter;
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private Boolean check_history = false;
     private ProgressDialog progressDialog;
     private get_data getdata;
+    private TextView tv_district;
     private String url="https://doan-72e1b.firebaseio.com/";
 
     @Override
@@ -84,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         btnSearch = (Button) findViewById(R.id.btnSearch);
         lvData = (ListView) findViewById(R.id.lvData);
         customerArrayList = new ArrayList<Customer>();
+        tv_district=(TextView)findViewById(R.id.tv_district);
         autoeditCity = (AutoCompleteTextView) findViewById(R.id.autoeditCity);
         autoeditDistrict = (AutoCompleteTextView) findViewById(R.id.autoeditDistrict);
         array_district = new String[]{"Quan 1", "Quan 2", "Quan 3", "Quan 4", "Quan 5", "Quan 6", "Quan 7", "Quan 8", "Quan 9", "Quan 10", "Quan 11", "Quan 12", "Thu Duc", "Binh Thanh", "Go Vap"};
@@ -104,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 lvData.setVisibility(View.VISIBLE);
                 String search_district = autoeditDistrict.getText().toString();
                 String search_city = autoeditCity.getText().toString();
-                //loadData();
+                getdata.search_data(search_district,search_city);
                 check_history = false;
             }
         });
@@ -121,6 +125,19 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 check_history = false;
                 progressDialog.cancel();
+            }
+        });
+        lvData.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if(get_data.district.containsKey(firstVisibleItem)){
+                    tv_district.setText(String.valueOf(get_data.district.get(firstVisibleItem)));
+                }
             }
         });
         //chon du lieu trong my order

@@ -2,6 +2,7 @@ package com.example.tannguyen.project2017;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +33,19 @@ public class SignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
+        SharedPreferences pre=getSharedPreferences
+                ("account",MODE_PRIVATE);
+        String check_user=pre.getString("user", "");
+        if(!check_user.equals("")) {
+            ProgressDialog progressDialog=new ProgressDialog(SignInActivity.this);
+            progressDialog.setMessage("Sign In...");
+            progressDialog.show();
+            user=check_user;
+            Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+            startActivity(intent);
+            progressDialog.cancel();
+            return;
+        }
         edtEmail = (EditText) findViewById(R.id.edtEmail);
         edtPassword = (EditText) findViewById(R.id.edtPassword);
         btnSignin = (Button) findViewById(R.id.btnSignin);
@@ -85,6 +99,11 @@ public class SignInActivity extends AppCompatActivity {
                                     Toast.makeText(SignInActivity.this,
                                             "Log in is successful!" + task.getException(), Toast.LENGTH_LONG).show();
                                     user=edtEmail.getText().toString().split("@")[0];
+                                    SharedPreferences pre=getSharedPreferences
+                                            ("account", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor=pre.edit();
+                                    editor.putString("user", user);
+                                    editor.commit();
                                     Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                                     startActivity(intent);
                                     progressdialog.cancel();

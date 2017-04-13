@@ -56,6 +56,18 @@
             android:textSize="10sp" />
     </TableRow>
 
+    <TextView
+        android:id="@+id/tv_district"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:background="@drawable/custom_lisview"
+        android:gravity="center_vertical"
+        android:text=""
+        android:textColor="@android:color/background_dark"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:theme="@style/Base.AlertDialog.AppCompat.Light" />
+
     <ListView
         android:id="@+id/lvData"
         android:layout_width="match_parent"
