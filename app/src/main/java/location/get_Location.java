@@ -107,7 +107,7 @@ public class get_Location /*implements LocationListener*/ {
         try {
             // May throw an IOException
             address = coder.getFromLocationName(strAddress, 1);
-            if (address == null) {
+            if (address == null || address.size()==0) {
                 return null;
             }
             Address location = address.get(0);

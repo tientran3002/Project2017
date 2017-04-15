@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
@@ -75,10 +76,10 @@ public class MainActivity extends AppCompatActivity {
         getdata.loadData();
         event();
         //start service
-        if(!service_notify.running) {
             Intent myIntent = new Intent(MainActivity.this, service_notify.class);
+            myIntent.putExtra("main",true);
             // Gọi phương thức startService (Truyền vào đối tượng Intent)
-            this.startService(myIntent);}
+            this.startService(myIntent);
         //test_datafirebase();
         //test_load_data();
     }
@@ -266,6 +267,28 @@ public class MainActivity extends AppCompatActivity {
             getdata.loadData();
             //loadData();
         }
+        if(id==R.id.item_logout) {
+            SharedPreferences pre=getSharedPreferences
+                    ("account", MODE_PRIVATE);
+            SharedPreferences.Editor editor=pre.edit();
+            editor.clear();
+            editor.commit();
+            Intent intent = new Intent(MainActivity.this, SignInActivity.class);
+            startActivity(intent);
+            Intent myIntent = new Intent(MainActivity.this, service_notify.class);
+            this.stopService(myIntent);
+            finish();
+        }
         return super.onOptionsItemSelected(item);
     }
+
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        SharedPreferences pre=getSharedPreferences
+//                ("account",MODE_PRIVATE);
+//        SharedPreferences.Editor editor=pre.edit();
+//        editor.putBoolean("destroy",true);
+//        editor.commit();
+//    }
 }

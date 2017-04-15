@@ -102,6 +102,7 @@ public class get_data {
 //        });
     }
     public void search_data(final String dis_search, final String city_search) {
+        dis="";
         Firebase.setAndroidContext(context);
         Firebase myFireBase = new Firebase(url);
         myFireBase.orderByChild("district").addValueEventListener(new ValueEventListener() {
